@@ -38,8 +38,32 @@ def home():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/temp/yyyy-mm-dd/yyyy-mm-dd"
     )
+
+@app.route("/api/v1.0/precipitation")
+def precipitation():
+    prev_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)
+    precipitation = session.query(Measurement.date, Measurement.prcp).\
+        filter(Measurement.date >= prev_year).all()
+    new_precipitation = {date: prcp for date, prcp in precipitation}
+
+    return jsonify(new_precipitation)
+
+@app.route("/api/v1.0/stations")
+def stations():
+    results = session.query(Station.station).all()
+    stations = list(np.ravel(results))
+    
+    return jsonify(stations=stations)
+
+@app.route("/api/v1.0/tobs")
+def tobs():
+    prev_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)
+    primary_station = session.query(Measurement.tobs).\
+        filter(Measurement.station == 'USC00519281').\
+        filter(Measurement.date >= prev_year).all()
+    results = list(np.ravel(primary_station))
+    return jsonify(results=results)
 
 
 if __name__ == "__main__":
