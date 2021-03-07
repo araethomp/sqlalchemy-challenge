@@ -22,7 +22,7 @@ Station = Base.classes.station
 
 session = Session(engine)
 
-#session.close()
+session.close()
 
 #Flask
 
